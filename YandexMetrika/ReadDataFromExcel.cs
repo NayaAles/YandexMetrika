@@ -1,9 +1,10 @@
 ﻿using Aspose.Cells;
 using System.Reflection;
+using YandexMetrika.EntitiesYandexMetrika;
 
 namespace YandexMetrika
 {
-    public class ReadFromExcel
+    public class ReadDataFromExcel
     {
         public static List<Data1C> GetData()
         {
@@ -11,10 +12,7 @@ namespace YandexMetrika
             Workbook workbook = new Workbook();
 
             LoadOptions xlsxLoadOptions = new LoadOptions(LoadFormat.Xlsx);
-            xlsxLoadOptions.Password = "T96Gskwi2KYoEoXo3JMLxqrpSqOnNGzn";
-
-            //License cellsLicense = new License();
-            //cellsLicense.SetLicense("Aspose.Cells.lic");
+            xlsxLoadOptions.Password = SecureData.GetSecureData("PasswordExcel");
 
             try
             {
@@ -26,7 +24,8 @@ namespace YandexMetrika
             }
 
             WorksheetCollection worksheets = workbook.Worksheets;
-            Worksheet worksheet = worksheets[0]; // first worksheet
+            // get data from first worksheet
+            Worksheet worksheet = worksheets[0];
 
             int rows = worksheet.Cells.MaxDataRow + 1;
             int cols = worksheet.Cells.MaxDataColumn + 1;

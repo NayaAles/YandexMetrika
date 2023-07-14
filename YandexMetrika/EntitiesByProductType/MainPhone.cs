@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace YandexMetrika.Entities;
 
-public partial class Turnover
+public partial class MainPhone
 {
     public int Id { get; set; }
 
-    public string Inn { get; set; } = null!;
+    public string Phone { get; set; } = null!;
 
-    public string? OrganizationName { get; set; }
+    public string? ListInn { get; set; }
 
     public decimal? Nta { get; set; }
 
@@ -87,5 +85,9 @@ public partial class Turnover
 
     public decimal? Erlikid { get; set; }
 
-    public decimal? SumTurnover { get; set; }
+    public decimal? Turnover { get; set; }
+
+    public DateOnly? DateCreate { get; set; }
+
+    public string? SourceCreate { get; set; }
 }

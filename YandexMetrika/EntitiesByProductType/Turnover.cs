@@ -1,19 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace YandexMetrika.Entities;
 
-public partial class Main
+public partial class Turnover
 {
     public int Id { get; set; }
 
-    public string Email { get; set; } = null!;
+    public string Inn { get; set; } = null!;
 
-    public string? DomainCorp { get; set; }
-
-    public string? DomainSecondCorp { get; set; }
-
-    public string? ListInn { get; set; }
+    public string? OrganizationName { get; set; }
 
     public decimal? Nta { get; set; }
 
@@ -91,9 +85,5 @@ public partial class Main
 
     public decimal? Erlikid { get; set; }
 
-    public decimal? Turnover { get; set; }
-
-    public DateOnly? DateCreate { get; set; }
-
-    public string? SourceCreate { get; set; }
+    public decimal? SumTurnover { get; set; }
 }

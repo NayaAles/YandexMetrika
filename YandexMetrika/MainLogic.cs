@@ -7,7 +7,7 @@ namespace YandexMetrika
         {
             var curentDirectory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName;
 
-            var files = new DirectoryInfo(curentDirectory + "\\Results").GetFiles("*.csv")
+            var files = new DirectoryInfo(curentDirectory + @"\Results").GetFiles("*.csv")
                 .ToDictionary(x => x.CreationTime, x => x.FullName);
 
             var lastFileInResult = files[files.Select(x => x.Key).Max()];
@@ -16,24 +16,22 @@ namespace YandexMetrika
             var pathOut = @$"{curentDirectory}\Results\YandexMetrika_{now}.csv";
             var pathSaveData = @$"{curentDirectory}\Results\HistoricalData\YandexMetrika_{now}.csv";
 
+            var dataAll = new List<ParseData>();
+            var dataAllPrevious = new List<ParseData>();
+
             if (!File.Exists(pathOut))
             {
-                var dataAll = new List<ParseData>();
-                var dataAllPrevious = new List<ParseData>();
-
                 if (!File.Exists(pathSaveData))
                 {
-                    var inDatas = ReadFromExcel.GetData(); // get data from 1C
+                    var inDatas = ReadDataFromExcel.GetData();  // get data from 1C
 
-                    var preparedData = PreparedData.GetData(inDatas); // parse data
-
-                    dataAll = DataProcessing.Run(preparedData); // base enrichment
+                    dataAll = DataProcessing.Run(inDatas);  // base enrichment
 
                     WriteReadCsv.SaveToCsv(dataAll, pathSaveData, ','); // save to csv
                 }
                 else
                 {
-                    dataAll = WriteReadCsv.ReadFromCsv(pathSaveData, ','); //read from csv  
+                    dataAll = WriteReadCsv.ReadFromCsv(pathSaveData, ',');  //read from csv  
                 }
 
                 if (File.Exists(lastFileInResult))
@@ -68,31 +66,8 @@ namespace YandexMetrika
                 }
 
                 WriteReadCsv.SaveToCsv(dataAll, pathOut, ',');
+                DataToDbSql.Save(dataAll, ApiYandexMetrika.SimplePost(pathOut, "UPDATE", "COMMA"));
             }
-
-            ApiYandexMetrika.SimplePost(pathOut, "UPDATE", "COMMA");
-            Console.WriteLine(new string('_', 57));
-            Console.WriteLine("Данные загружены в метрику");
-
-            ///////////////////////////////////////////////////////////////////////////////
-            //foreach (var item in dataAll)
-            //{
-            //    progress.Add(new InProgress
-            //    {
-            //        Id = item.Id,
-            //        ContactData = item.Data,
-            //        DataType = item.Type,
-            //        CreateDateTime = DateTime.Parse(item.DateCreate)
-            //    });
-            //}
-
-            //using (YandexMetrikaContext context = new YandexMetrikaContext()) // save to sql
-            //{
-            //    context.InProgresses.RemoveRange(context.InProgresses); // DELETE ALL!!!
-
-            //    context.InProgresses.AddRange(progress);
-            //    context.SaveChanges();
-            //}
         }
     }
 }

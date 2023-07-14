@@ -30,7 +30,8 @@ namespace YandexMetrika
             var array = Regex.Matches(Regex.Replace(line, @$"{separator}{separator}", $"{separator} {separator}")
             .ToString(), $"\"([^\"]+).|[^{separator}]+")
             .Cast<Match>()
-            .Select(x => Regex.Replace(x.ToString(), "\"", string.Empty)).ToArray();
+            .Select(x => Regex.Replace(x.ToString(), "\"", string.Empty))
+            .ToArray();
 
             for (int i = 0; i < ParseData.FieldsCount(); i++)
                 data.GetType().GetField(ParseData.Fields().ElementAt(i), BindingFlags.Instance | BindingFlags.NonPublic).SetValue(data, array[i].ToString().Trim());
@@ -75,6 +76,5 @@ namespace YandexMetrika
                 }
             }
         }
-
     }
 }

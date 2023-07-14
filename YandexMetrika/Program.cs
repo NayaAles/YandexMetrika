@@ -3,16 +3,16 @@ using Microsoft.Win32.TaskScheduler;
 
 MainLogic.Run();
 
-try
+using (TaskService service = new TaskService())
 {
-    using (TaskService service = new TaskService())
+    var tasks = service.RootFolder.GetTasks().Select(x => x.Name);
+
+    foreach (var task in tasks)
     {
-        service.RootFolder.DeleteTask("YandexMetrika");
-        service.RootFolder.DeleteTask("YandexMetrika1");
-        service.RootFolder.DeleteTask("YandexMetrika2");
+        if (task.Contains("YandexMetrika"))
+            service.RootFolder.DeleteTask(task);
     }
 }
-catch (Exception) { }
 
 AutoTask.SaveTask("YandexMetrika", 1);
 AutoTask.SaveTask("YandexMetrika1", 2);

@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace YandexMetrika.Entities;
 
-public partial class MainEmail
+public partial class Main
 {
     public int Id { get; set; }
 

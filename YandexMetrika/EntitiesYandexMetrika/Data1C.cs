@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace YandexMetrika
+namespace YandexMetrika.EntitiesYandexMetrika
 {
     public class Data1C
     {

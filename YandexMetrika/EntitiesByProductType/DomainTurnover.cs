@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace YandexMetrika.Entities;
 
-public partial class MainPhone
+public partial class DomainTurnover
 {
     public int Id { get; set; }
 
-    public string Phone { get; set; } = null!;
+    public string DomainCorp { get; set; } = null!;
+
+    public string? DomainSecondCorp { get; set; }
 
     public string? ListInn { get; set; }
 
@@ -88,8 +88,4 @@ public partial class MainPhone
     public decimal? Erlikid { get; set; }
 
     public decimal? Turnover { get; set; }
-
-    public DateOnly? DateCreate { get; set; }
-
-    public string? SourceCreate { get; set; }
 }

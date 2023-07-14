@@ -1,13 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-
+﻿
 namespace YandexMetrika.Entities;
 
-public partial class DomainTurnover
+public partial class MainEmail
 {
     public int Id { get; set; }
 
-    public string DomainCorp { get; set; } = null!;
+    public string Email { get; set; } = null!;
+
+    public string? DomainCorp { get; set; }
 
     public string? DomainSecondCorp { get; set; }
 
@@ -90,4 +90,8 @@ public partial class DomainTurnover
     public decimal? Erlikid { get; set; }
 
     public decimal? Turnover { get; set; }
+
+    public DateOnly? DateCreate { get; set; }
+
+    public string? SourceCreate { get; set; }
 }
