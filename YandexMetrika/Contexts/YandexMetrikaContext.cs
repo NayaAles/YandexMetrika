@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using YandexMetrika.EntitiesYandexMetrika;
 
-namespace YandexMetrika.Contexts;
+namespace YandexMetrika;
 
 public partial class YandexMetrikaContext : DbContext
 {
@@ -19,7 +19,7 @@ public partial class YandexMetrikaContext : DbContext
     public virtual DbSet<InProgress> InProgresses { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql(SecureData.GetSecureData("ConnectionYandexMetrika"), ServerVersion.Parse("8.0.32-mysql"));
+        => optionsBuilder.UseMySql(SecureData.GetSecureData("ConnectionYandexMetrika"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -34,6 +34,9 @@ public partial class YandexMetrikaContext : DbContext
             entity.ToTable("add_logs");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.DateCreated)
+                .HasColumnType("datetime")
+                .HasColumnName("date_created");
             entity.Property(e => e.Log)
                 .HasColumnType("text")
                 .HasColumnName("log");

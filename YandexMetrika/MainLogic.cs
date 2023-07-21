@@ -7,7 +7,9 @@ namespace YandexMetrika
         {
             var curentDirectory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName;
 
-            var files = new DirectoryInfo(curentDirectory + @"\Results").GetFiles("*.csv")
+            var files = new DirectoryInfo(curentDirectory + @"\Results")
+                .GetFiles("*.csv")
+                .OrderBy(x => x.CreationTime)
                 .ToDictionary(x => x.CreationTime, x => x.FullName);
 
             var lastFileInResult = files[files.Select(x => x.Key).Max()];
@@ -67,6 +69,15 @@ namespace YandexMetrika
 
                 WriteReadCsv.SaveToCsv(dataAll, pathOut, ',');
                 DataToDbSql.Save(dataAll, ApiYandexMetrika.SimplePost(pathOut, "UPDATE", "COMMA"));
+            }
+
+            if (files.Count() > 10) //  delete old files
+            {
+                foreach (var file in files)
+                {
+                    if (!file.Value.Equals(lastFileInResult))
+                        File.Delete(file.Value);
+                }
             }
         }
     }
