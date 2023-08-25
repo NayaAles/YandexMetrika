@@ -5,6 +5,8 @@
 *.xls*
 *.*~
 *.Results/
+*.Migrations/
+*.Properties/
 
 project.lock.json
 .DS_Store

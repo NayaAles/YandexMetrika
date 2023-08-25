@@ -35,7 +35,7 @@ public partial class ByProductTypeContext : DbContext
     public virtual DbSet<Turnover> Turnovers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql(SecureData.GetSecureData("ConnectionByProductType"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql"));
+        => optionsBuilder.UseMySql(SecureData.Get("ConnectionByProductType"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

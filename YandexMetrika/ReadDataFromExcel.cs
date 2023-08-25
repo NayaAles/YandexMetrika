@@ -12,7 +12,7 @@ namespace YandexMetrika
             Workbook workbook = new Workbook();
 
             LoadOptions xlsxLoadOptions = new LoadOptions(LoadFormat.Xlsx);
-            xlsxLoadOptions.Password = SecureData.GetSecureData("PasswordExcel");
+            xlsxLoadOptions.Password = SecureData.Get("PasswordExcel");
 
             try
             {

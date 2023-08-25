@@ -25,16 +25,15 @@ namespace YandexMetrika
             {
                 if (!File.Exists(pathSaveData))
                 {
-                    var inDatas = ReadDataFromExcel.GetData();  // get data from 1C
+                    //  Get data from 1C
+                    var inDatas = ReadDataFromExcel.GetData();
 
-                    dataAll = DataProcessing.Run(inDatas);  // base enrichment
-
-                    WriteReadCsv.SaveToCsv(dataAll, pathSaveData, ','); // save to csv
+                    //  Base enrichment
+                    dataAll = DataProcessing.Run(inDatas);
+                    WriteReadCsv.SaveToCsv(dataAll, pathSaveData, ',');
                 }
                 else
-                {
-                    dataAll = WriteReadCsv.ReadFromCsv(pathSaveData, ',');  //read from csv  
-                }
+                    dataAll = WriteReadCsv.ReadFromCsv(pathSaveData, ',');
 
                 if (File.Exists(lastFileInResult))
                 {
@@ -68,10 +67,25 @@ namespace YandexMetrika
                 }
 
                 WriteReadCsv.SaveToCsv(dataAll, pathOut, ',');
-                DataToDbSql.Save(dataAll, ApiYandexMetrika.SimplePost(pathOut, "UPDATE", "COMMA"));
             }
+            else
+                dataAll = WriteReadCsv.ReadFromCsv(pathOut, ',');
 
-            if (files.Count() > 10) //  delete old files
+            if (DataToDbSql.CheckLogs())
+            {
+                try
+                {
+                    DataToDbSql.Save(dataAll, ApiYandexMetrika.SimplePost(pathOut, "UPDATE", "COMMA"), null);
+                }
+                catch (Exception exception)
+                {
+                    //var token = ApiYandexMetrika.GetToken();
+                    //SecureData.WriteToken(token);
+                    DataToDbSql.Save(dataAll, ApiYandexMetrika.SimplePost(pathOut, "UPDATE", "COMMA"), exception);
+                }
+            }
+            
+            if (files.Count() > 10) //  Delete old files
             {
                 foreach (var file in files)
                 {

@@ -19,7 +19,7 @@ public partial class YandexMetrikaContext : DbContext
     public virtual DbSet<InProgress> InProgresses { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql(SecureData.GetSecureData("ConnectionYandexMetrika"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql"));
+        => optionsBuilder.UseMySql(SecureData.Get("ConnectionYandexMetrika"), Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

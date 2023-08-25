@@ -5,7 +5,8 @@ MainLogic.Run();
 
 using (TaskService service = new TaskService())
 {
-    var tasks = service.RootFolder.GetTasks().Select(x => x.Name);
+    var tasks = service.RootFolder.GetTasks()
+        .Select(x => x.Name);
 
     foreach (var task in tasks)
     {
