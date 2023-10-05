@@ -8,7 +8,7 @@ namespace YandexMetrika
         public static string Get(string keyWord)
         {
             var builder = new ConfigurationBuilder();
-            builder.SetBasePath(Directory.GetCurrentDirectory());
+            builder.SetBasePath(CurrentDirectory.Get());
             builder.AddJsonFile("appConfig.json");
             var config = builder.Build();
 

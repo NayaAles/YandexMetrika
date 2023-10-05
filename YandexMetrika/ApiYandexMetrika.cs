@@ -1,12 +1,11 @@
-﻿using System.Net;
-using System.Text;
-using OpenQA.Selenium;
+﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using System.Text.RegularExpressions;
+using System.Net.Http.Headers;
 
 namespace YandexMetrika
 {
-    public class ApiYandexMetrika
+    public static class ApiYandexMetrika
     {
         private const string CssButton = "#root > div > div.passp-page > div.passp-flex-wrapper > div > div" +
             " > div.passp-auth-content > div:nth-child(3) > div > form > button";
@@ -45,32 +44,27 @@ namespace YandexMetrika
             }
         }
 
-        public static string SimplePost(string filePath, string mode, string delimiter)
+        public static async Task<string> UploadCsv(string filePath, string fileName, string mode, string delimiter)
         {
             string url = $"https://api-metrika.yandex.net/cdp/api/v1/counter/{SecureData.Get("CounterId")}" +
-                $"/data/simple_orders?merge_mode={mode}&delimiter_type={delimiter}";
+                   $"/data/simple_orders?merge_mode={mode}&delimiter_type={delimiter}";
 
-            var client = new MyWebClient();
-            client.Credentials = CredentialCache.DefaultCredentials;
-            client.Headers.Add("Authorization", SecureData.Get("Authorization"));
-            client.Headers.Add("Content-Type", "text/csv");
+            byte[] fileByteArray = File.ReadAllBytes(filePath);
+            var content = new MultipartFormDataContent(new string('-', 10) + Guid.NewGuid());
+            var byteArrayContent = new ByteArrayContent(fileByteArray);
 
-            var response = Encoding.ASCII.GetString(client.UploadFile(url, "POST", filePath));
-            Console.WriteLine(response);
-            client.Dispose();
+            byteArrayContent.Headers.ContentType = MediaTypeHeaderValue.Parse("text/csv");
+            content.Add(byteArrayContent, "\"file\"", $"\"{fileName}\"");
 
-            return response;
-        }
-    }
+            var client = new HttpClient();
+            client.Timeout = TimeSpan.FromMinutes(5);
+            client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("OAuth", SecureData.Get("Authorization"));
 
-    public class MyWebClient : WebClient
-    {
-        protected override WebRequest GetWebRequest(Uri uri)
-        {
-           var w = (HttpWebRequest)base.GetWebRequest(uri);
-            w.Timeout = 1000 * 20 * 60 * 1000;
+            var response = await client.PostAsync(url, content);
+            var result = await response.Content.ReadAsStringAsync();
 
-            return w;
+            return result;
         }
     }
 }

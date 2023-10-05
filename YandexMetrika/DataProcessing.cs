@@ -8,7 +8,8 @@ namespace YandexMetrika
         public static List<ParseData> Run(List<Data1C> inDatas)
         {
             var preparedData = new Dictionary<string, DateTime>();
-            var mnGroup = inDatas.GroupBy(x => x.Code);
+            var mnGroup = inDatas.GroupBy(x => x.Code)
+                .ToList();
 
             foreach (var mn in mnGroup)
             {
@@ -16,7 +17,8 @@ namespace YandexMetrika
                 var dateLast = new DateTime();
 
                 bool statusCheck = false;
-                var statusGroup = mn.GroupBy(x => x.VerifiedByManager);
+                var statusGroup = mn.GroupBy(x => x.VerifiedByManager)
+                    .ToList();
 
                 foreach (var lable in statusGroup)
                 {
@@ -28,15 +30,15 @@ namespace YandexMetrika
 
                         var diffDays = (today - dateLast).TotalDays;
                         if (diffDays < 61)
-                        {
                             statusCheck = true;
-                        }
                     }
                 }
 
                 if (statusCheck)
                 {
-                    var inns = mn.GroupBy(x => x.Inn).Select(y => y.Key).ToList();
+                    var inns = mn.GroupBy(x => x.Inn)
+                        .Select(y => y.Key)
+                        .ToList();
 
                     foreach (var inn in inns)
                     {
@@ -59,12 +61,11 @@ namespace YandexMetrika
                 foreach (var domain in domainDate)
                 {
                     if (!domainDateDict.ContainsKey(domain.Key))
-                    {
                         domainDateDict.Add(domain.Key, domain.Value);
-                    }
                 }
 
-                var emailsQuery = context.MainEmails.ToList();
+                var emailsQuery = context.MainEmails
+                    .ToList();
 
                 // get emails
                 var emails = emailsQuery

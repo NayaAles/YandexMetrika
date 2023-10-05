@@ -34,15 +34,17 @@ namespace YandexMetrika
             .ToArray();
 
             for (int i = 0; i < ParseData.FieldsCount(); i++)
-                data.GetType().GetField(ParseData.Fields().ElementAt(i), BindingFlags.Instance | BindingFlags.NonPublic).SetValue(data, array[i].ToString().Trim());
+                data.GetType().GetField(ParseData.Fields().ElementAt(i), BindingFlags.Instance | BindingFlags.NonPublic)
+                    .SetValue(data, array[i].ToString().Trim());
 
             return data;
         }
 
         public static void SaveToCsv<T>(List<T> outDatas, string pathOut, char separator) //экранирование if class.field.Contains(separator)
         {
-            int fieldsCount = (int)outDatas[0].GetType().GetMethod("FieldsCount").Invoke(null, null);
-            List<string> fields = (List<string>)outDatas[0].GetType().GetMethod("Fields").Invoke(null, null);
+            var fields = GetFields<T>()
+                .ToList();
+            var fieldsCount = fields.Count();
 
             int k  = 0;
             using (StreamWriter writer = new StreamWriter(pathOut))
@@ -50,7 +52,8 @@ namespace YandexMetrika
                 foreach (var data in outDatas)
                 {
                     k++;
-                    if (k == 1 && data.GetType().GetField(fields.ElementAt(0), BindingFlags.Instance | BindingFlags.NonPublic).GetValue(data).ToString() != "id")
+                    if (k == 1 && data.GetType().GetField(fields.ElementAt(0), BindingFlags.Instance | BindingFlags.NonPublic)
+                        .GetValue(data).ToString() != "id")
                     {
                         string titles = "id,emails_md5,phones_md5,order_status,create_date_time";
                         writer.WriteLine(titles);
@@ -60,7 +63,8 @@ namespace YandexMetrika
 
                     for (int i = 0; i < fieldsCount; i++)
                     {
-                        string value = data.GetType().GetField(fields.ElementAt(i), BindingFlags.Instance | BindingFlags.NonPublic).GetValue(data).ToString();
+                        string value = data.GetType().GetField(fields.ElementAt(i), BindingFlags.Instance | BindingFlags.NonPublic)
+                            .GetValue(data).ToString();
 
                         if (value == " ")
                             value = "";
@@ -75,6 +79,15 @@ namespace YandexMetrika
                     writer.WriteLine(exit);
                 }
             }
+        }
+
+        private static string[] GetFields<T>()
+        {
+            var fields = typeof(T).GetRuntimeFields()
+                .Select(x => x.Name)
+                .ToArray();
+
+            return fields;
         }
     }
 }

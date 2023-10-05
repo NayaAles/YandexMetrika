@@ -8,7 +8,7 @@ namespace YandexMetrika
     {
         public static List<Data1C> GetData()
         {
-            const string PathDataFrom1C = @"\\192.168.0.12\выгрузка\ВсеСчета.xlsx";
+            const string PathDataFrom1C = @"\\192.168.0.12\выгрузка\Статистика.xlsx";
             Workbook workbook = new Workbook();
 
             LoadOptions xlsxLoadOptions = new LoadOptions(LoadFormat.Xlsx);

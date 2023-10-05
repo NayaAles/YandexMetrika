@@ -3,9 +3,9 @@ namespace YandexMetrika
 {
     public class MainLogic
     {
-        public static void Run()
+        public static async Task<string> Run()
         {
-            var curentDirectory = new DirectoryInfo(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName;
+            var curentDirectory = CurrentDirectory.Get();
 
             var files = new DirectoryInfo(curentDirectory + @"\Results")
                 .GetFiles("*.csv")
@@ -14,9 +14,11 @@ namespace YandexMetrika
 
             var lastFileInResult = files[files.Select(x => x.Key).Max()];
 
-            var now = DateTime.Now.ToString("yyyy-MM-dd");
-            var pathOut = @$"{curentDirectory}\Results\YandexMetrika_{now}.csv";
-            var pathSaveData = @$"{curentDirectory}\Results\HistoricalData\YandexMetrika_{now}.csv";
+            var fileName = $"YandexMetrika_{DateTime.Now.ToString("yyyy-MM-dd")}";
+            var pathOut = @$"{curentDirectory}\Results\{fileName}.csv";
+            var pathSaveData = @$"{curentDirectory}\Results\HistoricalData\{fileName}.csv";
+
+            var response = $"Error: not response. File {fileName} not uploaded";
 
             var dataAll = new List<ParseData>();
             var dataAllPrevious = new List<ParseData>();
@@ -69,23 +71,30 @@ namespace YandexMetrika
                 WriteReadCsv.SaveToCsv(dataAll, pathOut, ',');
             }
             else
+            {
                 dataAll = WriteReadCsv.ReadFromCsv(pathOut, ',');
+            }
 
             if (DataToDbSql.CheckLogs())
             {
                 try
                 {
-                    DataToDbSql.Save(dataAll, ApiYandexMetrika.SimplePost(pathOut, "UPDATE", "COMMA"), null);
+                    DataToDbSql.Save(dataAll, response =
+                        await ApiYandexMetrika.UploadCsv(pathOut, fileName, "UPDATE", "COMMA"), null);
                 }
                 catch (Exception exception)
                 {
+                    //  If token expired
                     //var token = ApiYandexMetrika.GetToken();
                     //SecureData.WriteToken(token);
-                    DataToDbSql.Save(dataAll, ApiYandexMetrika.SimplePost(pathOut, "UPDATE", "COMMA"), exception);
+
+                    DataToDbSql.Save(dataAll,
+                        await ApiYandexMetrika.UploadCsv(pathOut, fileName, "UPDATE", "COMMA"), exception);
                 }
             }
-            
-            if (files.Count() > 10) //  Delete old files
+
+            //  Delete old files
+            if (files.Count() > 10)
             {
                 foreach (var file in files)
                 {
@@ -93,6 +102,8 @@ namespace YandexMetrika
                         File.Delete(file.Value);
                 }
             }
+
+            return response;
         }
     }
 }
