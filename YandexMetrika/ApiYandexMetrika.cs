@@ -44,10 +44,12 @@ namespace YandexMetrika
             }
         }
 
-        public static async Task<string> UploadCsv(string filePath, string fileName, string mode, string delimiter)
+        public static async Task<string> UploadCsv( string fileName, string mode, string delimiter)
         {
-            string url = $"https://api-metrika.yandex.net/cdp/api/v1/counter/{SecureData.Get("CounterId")}" +
-                   $"/data/simple_orders?merge_mode={mode}&delimiter_type={delimiter}";
+            //debug
+            var filePath = @"C:\Users\user\source\repos\YandexMetrika\YandexMetrika\Results\YandexMetrika_2023-10-09.csv";
+            var counter = SecureData.Get("CounterId");
+            string url = $"https://api-metrika.yandex.net/cdp/api/v1/counter/{counter}/data/simple_orders?merge_mode={mode}&delimiter_type={delimiter}";
 
             byte[] fileByteArray = File.ReadAllBytes(filePath);
             var content = new MultipartFormDataContent(new string('-', 10) + Guid.NewGuid());
