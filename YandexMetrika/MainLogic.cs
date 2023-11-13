@@ -77,20 +77,27 @@ namespace YandexMetrika
 
             if (DataToDbSql.CheckLogs())
             {
-                //try
-                //{
-                var d = await ApiYandexMetrika.UploadCsv(fileName, "UPDATE", "COMMA");
-                    DataToDbSql.Save(dataAll, d, null);
-                //}
-                //catch (Exception exception)
-                //{
+                var results = await ApiYandexMetrika.UploadCsv(pathOut, fileName, "UPDATE", "COMMA");
+                var check = results.Select(x => x.Contains("{\"uploading\":"))
+                    .Where(y => y == true)
+                    .Count();
+
+                if (check == results.Count)
+                {
+                    DataToDbSql.SaveData(dataAll);
+                    foreach (var result in results)
+                        DataToDbSql.SaveLog(result);
+
+                }
+                else
+                {
                     //  If token expired
                     //var token = ApiYandexMetrika.GetToken();
                     //SecureData.WriteToken(token);
 
-                    //DataToDbSql.Save(dataAll,
-                    //    await ApiYandexMetrika.UploadCsv(pathOut, fileName, "UPDATE", "COMMA"), exception);
-                //}
+                    foreach (var result in results)
+                        DataToDbSql.SaveLog(result);
+                }       
             }
 
             //  Delete old files

@@ -44,27 +44,61 @@ namespace YandexMetrika
             }
         }
 
-        public static async Task<string> UploadCsv( string fileName, string mode, string delimiter)
+        private static async Task<List<string>> SplitFile(string filePath, int numberOfLines)
         {
-            //debug
-            var filePath = @"C:\Users\user\source\repos\YandexMetrika\YandexMetrika\Results\YandexMetrika_2023-10-09.csv";
+            var datas = WriteReadCsv.ReadFromCsv(filePath, ',')
+                .Skip(1)
+                .ToList();
+            var files = new List<string>();
+
+            if (datas.Count > numberOfLines)
+            {
+                var number = (int)Math.Ceiling(Convert.ToDouble(datas.Count) / Convert.ToDouble(numberOfLines));
+                for (int i = 0; i < number; i++)
+                {
+                    var dataSplit = datas.Take(numberOfLines)
+                        .ToList();
+                    if (datas.Count > numberOfLines)
+                        datas.RemoveRange(i, numberOfLines);
+                    else
+                        dataSplit = datas;
+
+                    var path = Regex.Replace(filePath, @".csv+", $"_{i}.csv");
+                    files.Add(path);
+                    WriteReadCsv.SaveToCsv(dataSplit, path, ',');
+                }
+            }
+
+            return files;
+        }
+
+        public static async Task<List<string>> UploadCsv(string filePath, string fileName, string mode, string delimiter)
+        {
             var counter = SecureData.Get("CounterId");
-            string url = $"https://api-metrika.yandex.net/cdp/api/v1/counter/{counter}/data/simple_orders?merge_mode={mode}&delimiter_type={delimiter}";
+            string url = $"https://api-metrika.yandex.net/cdp/api/v1/counter/{counter}" +
+                $"/data/simple_orders?merge_mode={mode}&delimiter_type={delimiter}";
 
-            byte[] fileByteArray = File.ReadAllBytes(filePath);
-            var content = new MultipartFormDataContent(new string('-', 10) + Guid.NewGuid());
-            var byteArrayContent = new ByteArrayContent(fileByteArray);
+            var files = await SplitFile(filePath, 300000);
+            var result = new List<string>();
+            foreach (var file in files)
+            {
+                byte[] fileByteArray = File.ReadAllBytes(file);
+                var content = new MultipartFormDataContent(new string('-', 10) + Guid.NewGuid());
+                var byteArrayContent = new ByteArrayContent(fileByteArray);
 
-            byteArrayContent.Headers.ContentType = MediaTypeHeaderValue.Parse("text/csv");
-            content.Add(byteArrayContent, "\"file\"", $"\"{fileName}\"");
+                byteArrayContent.Headers.ContentType = MediaTypeHeaderValue.Parse("text/csv");
+                content.Add(byteArrayContent, "\"file\"", $"\"{fileName}\"");
 
-            var client = new HttpClient();
-            client.Timeout = TimeSpan.FromMinutes(5);
-            client.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("OAuth", SecureData.Get("Authorization"));
+                using (var client = new HttpClient())
+                {
+                    client.Timeout = TimeSpan.FromMinutes(10);
+                    client.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("OAuth", SecureData.Get("Authorization"));
 
-            var response = await client.PostAsync(url, content);
-            var result = await response.Content.ReadAsStringAsync();
+                    var response = await client.PostAsync(url, content);
+                    result.Add(await response.Content.ReadAsStringAsync());
+                }
+            }
 
             return result;
         }
