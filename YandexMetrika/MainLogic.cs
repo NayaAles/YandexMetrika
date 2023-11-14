@@ -87,7 +87,6 @@ namespace YandexMetrika
                     DataToDbSql.SaveData(dataAll);
                     foreach (var result in results)
                         DataToDbSql.SaveLog(result);
-
                 }
                 else
                 {
@@ -100,14 +99,28 @@ namespace YandexMetrika
                 }       
             }
 
-            //  Delete old files
+            files = new DirectoryInfo(curentDirectory + @"\Results")
+                .GetFiles("*.csv")
+                .OrderBy(x => x.CreationTime)
+                .ToDictionary(x => x.CreationTime, x => x.FullName);
+
+            var filesToDelete = files.Where(x => x.Value.Contains("DELETE"))
+                .Select(x => x.Value)
+                .ToList();
+
+            //  Delete old files and split files
             if (files.Count() > 10)
             {
                 foreach (var file in files)
                 {
-                    if (!file.Value.Equals(lastFileInResult))
+                    if (!file.Value.Equals(lastFileInResult) && !file.Value.Equals(pathOut))
                         File.Delete(file.Value);
                 }
+            }
+            else if (filesToDelete.Count > 0)
+            {
+                foreach (var file in filesToDelete)
+                     File.Delete(file);
             }
 
             return response;

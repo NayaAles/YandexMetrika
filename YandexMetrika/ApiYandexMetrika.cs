@@ -63,7 +63,7 @@ namespace YandexMetrika
                     else
                         dataSplit = datas;
 
-                    var path = Regex.Replace(filePath, @".csv+", $"_{i}.csv");
+                    var path = Regex.Replace(filePath, @".csv+", $"_{i}DELETE.csv");
                     files.Add(path);
                     WriteReadCsv.SaveToCsv(dataSplit, path, ',');
                 }
