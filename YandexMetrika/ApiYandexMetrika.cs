@@ -91,7 +91,7 @@ namespace YandexMetrika
 
                 using (var client = new HttpClient())
                 {
-                    client.Timeout = TimeSpan.FromMinutes(10);
+                    client.Timeout = TimeSpan.FromMinutes(5);
                     client.DefaultRequestHeaders.Authorization =
                         new AuthenticationHeaderValue("OAuth", SecureData.Get("Authorization"));
 

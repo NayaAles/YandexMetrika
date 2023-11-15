@@ -78,6 +78,8 @@ namespace YandexMetrika
             if (DataToDbSql.CheckLogs())
             {
                 var results = await ApiYandexMetrika.UploadCsv(pathOut, fileName, "UPDATE", "COMMA");
+                results.ForEach(x => Console.WriteLine(x));
+
                 var check = results.Select(x => x.Contains("{\"uploading\":"))
                     .Where(y => y == true)
                     .Count();
