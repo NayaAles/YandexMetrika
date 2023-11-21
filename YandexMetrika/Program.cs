@@ -3,4 +3,4 @@
 await MainLogic.Run();
 
 AutoTask.DeleteOldTasks();
-AutoTask.SaveTasks("YandexMetrika", 3);
+AutoTask.SaveTasks("YandexMetrika", 4);
