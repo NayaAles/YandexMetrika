@@ -9,7 +9,7 @@ namespace YandexMetrika
             using (TaskService service = new TaskService())
             {
                 TaskDefinition definition = service.NewTask();
-                definition.RegistrationInfo.Description = nameTask;
+                definition.RegistrationInfo.Description = $"{nameTask}_{DateTime.Now}";
 
                 for (int i = 1; i <= daysOffSet; i++)
                 {
@@ -20,7 +20,7 @@ namespace YandexMetrika
                     var exe = new DirectoryInfo(System.Reflection.Assembly.GetExecutingAssembly().Location)
                         .Parent + @"\YandexMetrika.exe";
                     definition.Actions.Add(new ExecAction(exe, null, Path.GetDirectoryName(exe)));
-                    service.RootFolder.RegisterTaskDefinition(nameTask, definition);
+                    service.RootFolder.RegisterTaskDefinition($"{nameTask}_{i}", definition);
                 }
             }
         }
