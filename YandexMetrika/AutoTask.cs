@@ -30,7 +30,8 @@ namespace YandexMetrika
             using (TaskService service = new TaskService())
             {
                 var tasks = service.RootFolder.GetTasks()
-                    .Select(x => x.Name);
+                    .Select(x => x.Name)
+                    .ToList();
 
                 foreach (var task in tasks)
                 {
