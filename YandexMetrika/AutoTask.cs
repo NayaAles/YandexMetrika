@@ -8,11 +8,11 @@ namespace YandexMetrika
         {
             using (TaskService service = new TaskService())
             {
-                TaskDefinition definition = service.NewTask();
-                definition.RegistrationInfo.Description = $"{nameTask}_{DateTime.Now}";
-
                 for (int i = 1; i <= daysOffSet; i++)
                 {
+                    TaskDefinition definition = service.NewTask();
+                    definition.RegistrationInfo.Description = $"{nameTask}_{DateTime.Now}";
+
                     var date = Convert.ToDateTime(DateTime.Now.AddDays(i)
                                        .ToString("yyyy-MM-dd") + "T12:00:00");
                     definition.Triggers.Add(new TimeTrigger() { StartBoundary = date, Enabled = true });
